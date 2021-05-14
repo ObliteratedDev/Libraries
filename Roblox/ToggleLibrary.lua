@@ -6,7 +6,7 @@ togglelib.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 togglelib.ResetOnSpawn = false
 
 function library:CreateToggle(toggletext, callback)
-  callback = callback or function()end
+  local callback = callback or function()end
 
   local toggle = Instance.new("Frame", togglelib)
   local UICorner = Instance.new("UICorner", toggle)
