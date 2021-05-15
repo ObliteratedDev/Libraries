@@ -1,3 +1,7 @@
+if game.CoreGui:FindFirstChild("togglelib") then
+    game.CoreGui.togglelib:Destroy()
+end
+
 local library = {}
 
 local UIS = game:GetService("UserInputService")
