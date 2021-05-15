@@ -1,5 +1,7 @@
 local library = {}
 
+local UIS = game:GetService("UserInputService")
+
 local togglelib = Instance.new("ScreenGui", game.CoreGui)
 togglelib.Name = "togglelib"
 togglelib.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
@@ -58,44 +60,42 @@ function library:CreateToggle(toggletext, callback)
     end
   end)
 
-  local Drag = toggle
-  local gsCoreGui = game:GetService("CoreGui")
-  local gsTween = game:GetService("TweenService")
-  local UserInputService = game:GetService("UserInputService")
-  local dragging
-  local dragInput
-  local dragStart
-  local startPos
-  local function update(input)
-    local delta = input.Position - dragStart
-    local dragTime = .04
-    local SmoothDrag = {}
-    SmoothDrag.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    local dragSmoothFunction = gsTween:Create(Drag, TweenInfo.new(dragTime, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), SmoothDrag)
-    dragSmoothFunction:Play()
-  end
-  Drag.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-      dragging = true
-      dragStart = input.Position
-      startPos = Drag.Position
-      input.Changed:Connect(function()
-        if input.UserInputState == Enum.UserInputState.End then
-          dragging = false
-        end
-      end)
-    end
-  end)
-  Drag.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-      dragInput = input
-    end
-  end)
-  UserInputService.InputChanged:Connect(function(input)
-    if input == dragInput and dragging and Drag.Size then
-      update(input)
-    end
-  end)
+	function draggable(Frame)
+	    dragToggle = nil
+	    local dragSpeed = 3
+	    dragInput = nil
+	    dragStart = nil
+	    local dragPos = nil
+	    function updateInput(input)
+	        local Delta = input.Position - dragStart
+	        local Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + Delta.X, startPos.Y.Scale, startPos.Y.Offset + Delta.Y)
+	        game:GetService("TweenService"):Create(Frame, TweenInfo.new(0.25), {Position = Position}):Play()
+	    end
+	    Frame.InputBegan:Connect(function(input)
+	        if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) and UIS:GetFocusedTextBox() == nil then
+	            dragToggle = true
+	            dragStart = input.Position
+	            startPos = Frame.Position
+	            input.Changed:Connect(function()
+	                if input.UserInputState == Enum.UserInputState.End then
+	                    dragToggle = false
+	                end
+	            end)
+	        end
+	    end)
+	    Frame.InputChanged:Connect(function(input)
+	        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+	            dragInput = input
+	        end
+	    end)
+	    game:GetService("UserInputService").InputChanged:Connect(function(input)
+	        if input == dragInput and dragToggle then
+	            updateInput(input)
+	        end
+	    end)
+	end
+  
+  draggable(toggle)
 
   local function rainbow()
     local r = { 
